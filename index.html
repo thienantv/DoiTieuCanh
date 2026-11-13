@@ -1,88 +1,314 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hệ Thống Điểm Danh</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
-            --primary: #4f46e5; --primary-light: #e0e7ff;
-            --success: #10b981; --success-light: #d1fae5;
-            --error: #ef4444; --error-light: #fee2e2;
-            --bg-color: #f3f4f6; --card-bg: #ffffff;
-            --text-main: #111827; --text-muted: #6b7280; --border: #e5e7eb;
+            --primary: #4f46e5;
+            --primary-light: #e0e7ff;
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --error: #ef4444;
+            --error-light: #fee2e2;
+            --bg-color: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        
-        body { 
-            background-color: var(--bg-color); color: var(--text-main); 
-            padding: 12px; max-width: 500px; margin: auto; 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 12px;
+            max-width: 500px;
+            margin: auto;
             -webkit-font-smoothing: antialiased;
-            height: 100dvh; 
-            display: flex; flex-direction: column; 
-            overflow: hidden; 
-        }
-        
-        .card { 
-            background: var(--card-bg); padding: 12px; 
-            border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
-            border: 1px solid rgba(0,0,0,0.02);
-            display: flex; flex-direction: column;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        #card-header { flex-shrink: 0; margin-bottom: 12px; }
-        #card-list { flex: 1; min-height: 0; margin-bottom: 0; }
-
-        .header-title { text-align: center; font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 10px; letter-spacing: -0.5px; }
-
-        .activity-selector { margin-bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
-        .activity-selector select { 
-            width: 100%; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); 
-            background-color: var(--card-bg); font-size: 14px; font-weight: 600; color: var(--primary); 
-            outline: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        .card {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
         }
-        
-        .today-badge { display: flex; align-items: center; justify-content: center; background-color: var(--primary-light); color: var(--primary); padding: 6px 16px; border-radius: 20px; font-weight: 600; font-size: 13px; width: 100%; margin-bottom: 10px; }
 
-        #status { padding: 10px; text-align: center; font-weight: 600; font-size: 13px; border-radius: 10px; transition: all 0.3s ease; }
-        .status-default { background: var(--border); color: var(--text-muted); }
-        .status-success { background: var(--success-light); color: var(--success); }
-        .status-error { background: var(--error-light); color: var(--error); }
-        .status-loading { background: var(--primary-light); color: var(--primary); }
+        #card-header {
+            flex-shrink: 0;
+            margin-bottom: 12px;
+        }
 
-        .list-header-wrapper { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .list-header { font-size: 16px; font-weight: 700; margin: 0; }
-        .btn-toggle { background-color: var(--primary-light); color: var(--primary); border: none; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 12px; cursor: pointer; transition: all 0.2s ease; }
-        
-        .user-list { flex: 1; overflow-y: auto; padding-right: 4px; position: relative; }
-        .user-list::-webkit-scrollbar { width: 4px; }
-        .user-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .user-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; margin-bottom: 8px; border-radius: 12px; border: 1px solid var(--border); background: var(--card-bg); animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-        .user-item.active { background-color: #f8fafc; border-color: var(--success); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.05); }
+        #card-list {
+            flex: 1;
+            min-height: 0;
+            margin-bottom: 0;
+        }
 
-        .user-info-wrapper { display: flex; align-items: center; gap: 10px; }
-        .avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
-        .user-item.active .avatar { background-color: var(--success-light); color: var(--success); }
-        .user-info { display: flex; flex-direction: column; }
-        .user-name { font-size: 14px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
-        .user-id { font-size: 11px; font-weight: 500; color: var(--text-muted); }
+        .header-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
 
-        .custom-checkbox-container { position: relative; cursor: pointer; font-size: 22px; user-select: none; width: 26px; height: 26px; flex-shrink: 0; }
-        .custom-checkbox-container input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
-        .checkmark { position: absolute; top: 0; left: 0; height: 26px; width: 26px; background-color: var(--bg-color); border: 2px solid #d1d5db; border-radius: 50%; transition: all 0.2s ease; }
-        .custom-checkbox-container input:checked ~ .checkmark { background-color: var(--success); border-color: var(--success); }
-        .checkmark:after { content: ""; position: absolute; display: none; left: 8px; top: 5px; width: 5px; height: 10px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
-        .custom-checkbox-container input:checked ~ .checkmark:after { display: block; }
+        .activity-selector {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .activity-selector select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background-color: var(--card-bg);
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+        }
+
+        .today-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        #status {
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .status-default {
+            background: var(--border);
+            color: var(--text-muted);
+        }
+
+        .status-success {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .status-error {
+            background: var(--error-light);
+            color: var(--error);
+        }
+
+        .status-loading {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .list-header-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .list-header {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .btn-toggle {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+            position: relative;
+        }
+
+        .user-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .user-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .user-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-item.active {
+            background-color: #f8fafc;
+            border-color: var(--success);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.05);
+        }
+
+        .user-info-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .user-item.active .avatar {
+            background-color: var(--success-light);
+            color: var(--success);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .user-id {
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .custom-checkbox-container {
+            position: relative;
+            cursor: pointer;
+            font-size: 22px;
+            user-select: none;
+            width: 26px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .custom-checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 26px;
+            width: 26px;
+            background-color: var(--bg-color);
+            border: 2px solid #d1d5db;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .custom-checkbox-container input:checked~.checkmark {
+            background-color: var(--success);
+            border-color: var(--success);
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 8px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .custom-checkbox-container input:checked~.checkmark:after {
+            display: block;
+        }
     </style>
 </head>
+
 <body>
     <div class="card" id="card-header">
         <h2 class="header-title">Hệ Thống Điểm Danh</h2>
-        
+
         <div class="activity-selector">
             <select id="sheetSelect" onchange="onSheetChange()">
                 <option>Đang tải danh sách...</option>
@@ -90,7 +316,7 @@
         </div>
 
         <div class="today-badge">📅 Hôm nay: &nbsp;<span id="todayDisplay">...</span></div>
-        
+
         <div id="status" class="status-default">⏳ Đang kết nối hệ thống...</div>
     </div>
 
@@ -104,29 +330,30 @@
 
     <script>
         // Thay thế bằng URL Web App của bạn sau khi triển khai
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-eFwexblmIaUF8LSktT8i6QJ3Gj0nId9nkBlX5nK2_AfWjREF-17sl2DxTC1e1J2I/exec"; 
-        
-        let globalData = {}; 
-        let currentSheetName = ""; 
-        let usersData = []; 
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz-eFwexblmIaUF8LSktT8i6QJ3Gj0nId9nkBlX5nK2_AfWjREF-17sl2DxTC1e1J2I/exec";
+
+        let globalData = {};
+        let currentSheetName = "";
+        let usersData = [];
         let todayDateStr = "";
-        let showOnlyChecked = false; 
+        let showOnlyChecked = false;
 
-        // Hàng đợi xử lý tuần tự khi bấm nhanh
-        let requestQueue = [];
-        let isSending = false;
+        // Bộ gom nhóm (Batching) theo từng Sheet
+        let pendingChanges = {}; // { "TenSheet": { "1": true, "2": false } }
+        let syncTimer = null;
+        let isSyncing = false;
 
-        function getInitials(name) { 
-            return name && name.trim() !== "" ? name.trim().split(" ").pop().charAt(0).toUpperCase() : "?"; 
+        function getInitials(name) {
+            return name && name.trim() !== "" ? name.trim().split(" ").pop().charAt(0).toUpperCase() : "?";
         }
 
         function updateStatus(message, type) {
             const statusEl = document.getElementById("status");
-            statusEl.innerText = message; 
-            statusEl.className = ""; 
-            if(type === 'success') statusEl.classList.add('status-success');
-            else if(type === 'error') statusEl.classList.add('status-error');
-            else if(type === 'loading') statusEl.classList.add('status-loading');
+            statusEl.innerText = message;
+            statusEl.className = "";
+            if (type === 'success') statusEl.classList.add('status-success');
+            else if (type === 'error') statusEl.classList.add('status-error');
+            else if (type === 'loading') statusEl.classList.add('status-loading');
             else statusEl.classList.add('status-default');
         }
 
@@ -137,6 +364,12 @@
         }
 
         function onSheetChange() {
+            // Nếu đang có thay đổi chưa gửi ở tab cũ, đẩy gửi ngay lập tức trước khi chuyển tab
+            if (Object.keys(pendingChanges).length > 0) {
+                clearTimeout(syncTimer);
+                flushChanges();
+            }
+
             const select = document.getElementById("sheetSelect");
             currentSheetName = select.value;
             usersData = globalData[currentSheetName] || [];
@@ -147,15 +380,15 @@
         function loadInitialData() {
             fetch(SCRIPT_URL).then(res => res.json()).then(data => {
                 todayDateStr = data.today;
-                globalData = data.data; 
-                
+                globalData = data.data;
+
                 document.getElementById("todayDisplay").innerText = todayDateStr;
-                
+
                 const select = document.getElementById("sheetSelect");
                 select.innerHTML = "";
                 data.sheetNames.forEach(sheet => {
                     const opt = document.createElement("option");
-                    opt.value = sheet; 
+                    opt.value = sheet;
                     opt.innerText = sheet;
                     select.appendChild(opt);
                 });
@@ -167,22 +400,22 @@
 
                 renderList();
                 updateStatus("✅ Sẵn sàng điểm danh!", "success");
-                
-            }).catch(err => { 
-                updateStatus("⚠️ Lỗi kết nối Google Sheets!", "error"); 
+
+            }).catch(err => {
+                updateStatus("⚠️ Lỗi kết nối Google Sheets!", "error");
             });
         }
 
         function renderList() {
             const container = document.getElementById("userList");
             container.innerHTML = "";
-            
+
             let displayUsers = usersData.filter(u => u.id !== "" && u.name !== "");
 
             if (showOnlyChecked) {
                 displayUsers = displayUsers.filter(u => u.checked);
             }
-            
+
             if (displayUsers.length === 0) {
                 if (showOnlyChecked) {
                     container.innerHTML = `<div style="text-align:center; padding: 25px 10px; color: var(--text-muted); font-size: 13px; line-height: 1.6;">Chưa có ai được điểm danh trong mục này.</div>`;
@@ -212,71 +445,102 @@
             });
         }
 
-        // Đưa yêu cầu vào hàng đợi thay vì gửi đồng loạt
-        function enqueueRequest(id, userName, isChecked) {
-            // Nếu cùng 1 người bị bấm nhầm liên tục, chỉ giữ lại trạng thái cuối cùng
-            requestQueue = requestQueue.filter(item => !(item.id === id && item.sheetName === currentSheetName));
-            requestQueue.push({
-                id: id,
-                userName: userName,
-                checked: isChecked,
-                sheetName: currentSheetName
-            });
-            processQueue();
+        function scheduleSync(id, isChecked) {
+            if (!pendingChanges[currentSheetName]) {
+                pendingChanges[currentSheetName] = {};
+            }
+            // Ghi đè trạng thái mới nhất của ID này (nếu bấm nhầm rồi bỏ chọn thì tự cập nhật theo lần cuối)
+            pendingChanges[currentSheetName][id] = isChecked;
+
+            const totalPending = Object.values(pendingChanges).reduce((sum, obj) => sum + Object.keys(obj).length, 0);
+            updateStatus(`⏳ Đang gom ${totalPending} thay đổi...`, "loading");
+
+            // Đợi 500ms sau cú chạm cuối cùng mới gửi 1 gói duy nhất
+            clearTimeout(syncTimer);
+            syncTimer = setTimeout(flushChanges, 500);
         }
 
-        function processQueue() {
-            if (isSending || requestQueue.length === 0) return;
+        async function flushChanges() {
+            if (isSyncing) {
+                // Nếu gói trước đang gửi dở, đợi 300ms rồi gửi tiếp gói mới gom được
+                syncTimer = setTimeout(flushChanges, 300);
+                return;
+            }
 
-            isSending = true;
-            const currentTask = requestQueue.shift();
-            const remaining = requestQueue.length;
-            
-            updateStatus(
-                remaining > 0 
-                    ? `⏳ Đang lưu: ${currentTask.userName} (còn ${remaining} lượt chờ)...` 
-                    : `⏳ Đang lưu: ${currentTask.userName}...`, 
-                "loading"
-            );
+            const sheetsToSync = Object.keys(pendingChanges);
+            if (sheetsToSync.length === 0) return;
 
-            fetch(SCRIPT_URL, { 
-                method: "POST", 
-                mode: "no-cors", 
-                headers: { "Content-Type": "application/json" }, 
-                body: JSON.stringify({ 
-                    id: currentTask.id, 
-                    checked: currentTask.checked, 
-                    sheetName: currentTask.sheetName 
-                }) 
-            }).then(() => {
-                isSending = false;
-                if (requestQueue.length === 0) {
-                    updateStatus(
-                        currentTask.checked 
-                            ? `✅ Đã điểm danh: ${currentTask.userName}` 
-                            : `↩️ Đã bỏ chọn: ${currentTask.userName}`, 
-                        "success"
-                    );
-                } else {
-                    processQueue(); // Xử lý tiếp người kế tiếp trong hàng đợi
+            isSyncing = true;
+            // Lấy toàn bộ thay đổi hiện tại ra để gửi và làm trống bộ đệm cho các cú bấm tiếp theo
+            const batchToSend = pendingChanges;
+            pendingChanges = {};
+
+            let totalItems = 0;
+            for (const s of sheetsToSync) {
+                totalItems += Object.keys(batchToSend[s]).length;
+            }
+
+            updateStatus(`🚀 Đang đồng bộ ${totalItems} mục lên Google Sheets...`, "loading");
+
+            try {
+                for (const sheetName of sheetsToSync) {
+                    const itemsMap = batchToSend[sheetName];
+                    const itemsArray = Object.keys(itemsMap).map(id => ({
+                        id: id,
+                        checked: itemsMap[id]
+                    }));
+
+                    if (itemsArray.length > 0) {
+                        await fetch(SCRIPT_URL, {
+                            method: "POST",
+                            mode: "no-cors",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                sheetName: sheetName,
+                                items: itemsArray
+                            })
+                        });
+                    }
                 }
-            }).catch(() => {
-                isSending = false;
-                updateStatus(`⚠️ Lỗi khi lưu dữ liệu cho ${currentTask.userName}`, "error");
-                processQueue();
-            });
+
+                isSyncing = false;
+                // Kiểm tra xem trong lúc đang gửi người dùng có bấm thêm ai nữa không
+                if (Object.keys(pendingChanges).length > 0) {
+                    flushChanges();
+                } else {
+                    updateStatus(`✅ Đã lưu thành công (${totalItems} mục)!`, "success");
+                }
+            } catch (err) {
+                isSyncing = false;
+                updateStatus("⚠️ Lỗi kết nối khi lưu dữ liệu!", "error");
+            }
         }
 
         function manualCheck(id, isChecked) {
             let user = usersData.find(u => u.id === id);
             if (user) {
                 user.checked = isChecked;
-                renderList();
-                enqueueRequest(id, user.name, isChecked);
+                // Cập nhật trực tiếp class của dòng đó để mượt hơn thay vì vẽ lại cả danh sách
+                const rowEl = document.getElementById(`user-${id}`);
+                if (rowEl && !showOnlyChecked) {
+                    if (isChecked) rowEl.classList.add('active');
+                    else rowEl.classList.remove('active');
+                } else {
+                    renderList();
+                }
+                scheduleSync(id, isChecked);
             }
         }
+
+        // Đảm bảo gửi nốt dữ liệu nếu người dùng thoát/đóng tab đột ngột
+        window.addEventListener("beforeunload", function () {
+            if (Object.keys(pendingChanges).length > 0) {
+                flushChanges();
+            }
+        });
 
         loadInitialData();
     </script>
 </body>
+
 </html>
